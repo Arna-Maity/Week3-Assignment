@@ -26,7 +26,7 @@ include sources.mk
 # Platform Overrides
 PLATFORM = MSP432
 
-TARGET = c1m2
+TARGET = c1m3
 
 # General compiler and linker flags for both platforms
 CFLAGS = -Wall -Werror -g -O0 -std=c99
@@ -39,7 +39,7 @@ CPPFLAGs := -D$(PLATFORM)
 # Compiler Flags and Defines
 	ifeq ($(PLATFORM),MSP432)
 		# Architectures Specific Flags
-		LINKER_FILE := ../msp432p401r.lds
+		LINKER_FILE := msp432p401r.lds
 		CPU := cortex-m4
 		ARCH := thumb
 		MARCH := armv7e-m 
@@ -52,8 +52,9 @@ CPPFLAGs := -D$(PLATFORM)
 		OBJDUMP:= /usr/bin/arm-none-eabi-objdump
 		LDFLAGS := $(LDFLAGS) -T $(LINKER_FILE)
 		CFLAGS := $(CFLAGS) -mcpu=$(CPU) -march=$(MARCH) -m$(ARCH)  --specs=$(SPECS) $(FPU)
-		SOURCES:= $(SOURCES) interrupts_msp432p401r_gcc.c startup_msp432p401r_gcc.c system_msp432p401r.c
-		INCLUDES := $(INCLUDES) -I../include/msp432/ -I../include/CMSIS/
+		SOURCES:= $(SOURCES) 
+		# interrupts_msp432p401r_gcc.c startup_msp432p401r_gcc.c system_msp432p401r.c
+		INCLUDES := $(INCLUDES) -I./msp432/ -I./CMSIS/
 
 	else
 		CC := /usr/bin/gcc
@@ -76,28 +77,10 @@ main.i : main.c main.d
 main.o : main.i main.d
 	$(CC) -c $(INCLUDES) $(CFLAGS) $(CPPFLAGs) $< -o $@
 
-memory.i : memory.c memory.d
+misc.i : misc.c misc.d
 	$(CC) -E $(INCLUDES) $(CPPFLAGs) $< -o $@
 
-memory.o : memory.i memory.d
-	$(CC) -c $(INCLUDES) $(CFLAGS) $(CPPFLAGs) $< -o $@
-
-startup_msp432p401r_gcc.i : startup_msp432p401r_gcc.c startup_msp432p401r_gcc.d
-	$(CC) -E $(INCLUDES) $(CPPFLAGs) $< -o $@
-
-startup_msp432p401r_gcc.o : startup_msp432p401r_gcc.i startup_msp432p401r_gcc.d
-	$(CC) -c $(INCLUDES) $(CFLAGS) $(CPPFLAGs) $< -o $@
-
-interrupts_msp432p401r_gcc.i : interrupts_msp432p401r_gcc.c interrupts_msp432p401r_gcc.d
-	$(CC) -E $(INCLUDES) $(CPPFLAGs) $< -o $@
-
-interrupts_msp432p401r_gcc.o : interrupts_msp432p401r_gcc.i interrupts_msp432p401r_gcc.d
-	$(CC) -c $(INCLUDES) $(CFLAGS) $(CPPFLAGs) $< -o $@
-
-system_msp432p401r.i : system_msp432p401r.c system_msp432p401r.d
-	$(CC) -E $(INCLUDES) $(CPPFLAGs) $< -o $@
-
-system_msp432p401r.o : system_msp432p401r.i system_msp432p401r.d
+misc.o : misc.i misc.d
 	$(CC) -c $(INCLUDES) $(CFLAGS) $(CPPFLAGs) $< -o $@
 
 %.asm : %.o
